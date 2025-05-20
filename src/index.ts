@@ -66,7 +66,7 @@ app.post("/auth/signup", async (req: Request, res: Response) => {
   console.log(user);
 
   const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: "7d",
+    expiresIn: "1d",
   });
 
   res.cookie("token", token, {
@@ -122,4 +122,75 @@ app.post("/auth/login", async (req: Request, res: Response) => {
       age: user.age,
     },
   });
+});
+
+app.get("/me", async (req: Request, res: Response) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        email: true,
+        firstName: true,
+        lastName: true,
+        age: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ message: "Authorized", user });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+});
+
+app.post("/posts", async (req: Request, res: Response) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+
+    const { title, text, category, tags } = req.body;
+
+    if (!title || !text || !category || !Array.isArray(tags)) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const post = await prisma.post.create({
+      data: {
+        title,
+        text,
+        category,
+        tags,
+        userId: decoded.userId,
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return res.status(201).json({ message: "Post created", post });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 });

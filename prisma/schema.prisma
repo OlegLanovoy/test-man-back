@@ -25,9 +25,12 @@ model User {
 }
 
 model Post {
-  id Int @id @default(autoincrement())
-  title String 
-  text String
-  userId  Int// внешний ключ
-  user    User   @relation(fields: [userId], references: [id])
+  id        Int      @id @default(autoincrement())
+  title     String
+  text      String
+  createdAt DateTime @default(now()) // авто-дата при создании
+  userId    Int
+  category  String
+  tags      String[]
+  user      User     @relation(fields: [userId], references: [id])
 }

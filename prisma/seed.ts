@@ -23,29 +23,23 @@ async function main() {
   });
 
   // создаём посты для каждого
-  await prisma.post.createMany({
-    data: [
-      {
-        title: "Пост Али",
-        text: "Текст от Али",
-        userId: ali.id,
-      },
-      {
-        title: "Пост Омара",
-        text: "Что-то важное",
-        userId: omar.id,
-      },
-      {
-        title: "Пост Али 2",
-        text: "Текст от Али 2",
-        userId: ali.id,
-      },
-      {
-        title: "Пост Омара 2",
-        text: "Что-то важное 2",
-        userId: omar.id,
-      },
-    ],
+  await prisma.post.create({
+    data: {
+      title: "Пост Али",
+      text: "Пример",
+      category: "news",
+      tags: ["dev", "js"],
+      userId: ali.id,
+    },
+  });
+  await prisma.post.create({
+    data: {
+      title: "Пост Омара",
+      text: "Ещё пример",
+      category: "tech",
+      tags: ["typescript"],
+      userId: omar.id,
+    },
   });
 }
 
