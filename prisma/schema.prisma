@@ -22,6 +22,16 @@ model User {
   email String  @unique
   password String
   posts Post[]
+
+  // Additional info
+
+  webSite   String?
+  bio       String?
+  linkedIn  String?
+  instagram String?
+  facebook  String?
+  company   String?
+  role      String?
 }
 
 model Post {

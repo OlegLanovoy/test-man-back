@@ -12,6 +12,12 @@ interface User {
   age: number;
   email: string;
   password: string;
+  bio: string;
+  linkedIn: string;
+  instagram: string;
+  facebook: string;
+  company: string;
+  role: string;
 }
 
 const app = express();
@@ -137,10 +143,18 @@ app.get("/me", async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
-        email: true,
+        id: true,
         firstName: true,
         lastName: true,
         age: true,
+        email: true,
+        bio: true,
+        linkedIn: true,
+        webSite: true,
+        instagram: true,
+        facebook: true,
+        company: true,
+        role: true,
       },
     });
 
@@ -154,7 +168,7 @@ app.get("/me", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/posts", async (req: Request, res: Response) => {
+app.post("/post-create", async (req: Request, res: Response) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -192,5 +206,84 @@ app.post("/posts", async (req: Request, res: Response) => {
     return res.status(201).json({ message: "Post created", post });
   } catch (err) {
     return res.status(401).json({ message: "Invalid token" });
+  }
+});
+
+app.get("/posts", async (req: Request, res: Response) => {
+  try {
+    const posts = await prisma.post.findMany({
+      include: {
+        user: true,
+      },
+    });
+    res.json(posts);
+  } catch (err) {
+    console.error(`Failed to get posts`, err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+app.patch("/me/profile", async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: "Not authorized" });
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+    const userId = decoded.userId;
+
+    // Список допустимых полей
+    const allowedFields = [
+      "firstName",
+      "lastName",
+      "age",
+      "email",
+      "bio",
+      "linkedIn",
+      "instagram",
+      "facebook",
+      "company",
+      "role",
+    ];
+
+    // Фильтруем только те поля, которые реально пришли
+    const updateData = Object.fromEntries(
+      Object.entries(req.body).filter(
+        ([key, value]) =>
+          allowedFields.includes(key) &&
+          value !== undefined &&
+          value !== null &&
+          value !== ""
+      )
+    );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        age: true,
+        email: true,
+        bio: true,
+        linkedIn: true,
+        instagram: true,
+        facebook: true,
+        company: true,
+        role: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Profile updated",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
   }
 });
