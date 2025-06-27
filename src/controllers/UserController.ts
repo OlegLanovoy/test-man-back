@@ -4,6 +4,7 @@ import prisma from "../../prisma/prisma";
 
 import jwt from "jsonwebtoken";
 import { changeUserPassword } from "../services/user.service"; // логика вынесена сюда
+import { sendToQueue } from "../rabbit";
 
 export const getMe = async (req: Request, res: Response) => {
   const token = req.cookies.accessToken;
@@ -100,6 +101,15 @@ export const getProfile = async (req: Request, res: Response) => {
         role: true,
       },
     });
+
+    sendToQueue(
+      JSON.stringify({
+        type: "user.updated",
+        userId,
+        updatedFields: Object.keys(updateData),
+        timestamp: new Date().toISOString(),
+      })
+    );
 
     return res.status(200).json({
       message: "Profile updated",
