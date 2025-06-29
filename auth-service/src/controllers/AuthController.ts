@@ -3,7 +3,7 @@ import { JWT_SECRET } from "../secrets";
 import prisma from "../../prisma/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { createUser } from "../services/user.service"; // логика вынесена сюда
+import { createUser } from "../services/auth.service"; // логика вынесена сюда
 import { generateTokens } from "../utils/jwt";
 
 export const signup = async (req: Request, res: Response) => {

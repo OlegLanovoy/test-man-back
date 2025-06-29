@@ -4,7 +4,7 @@ import prisma from "../../prisma/prisma";
 import jwt from "jsonwebtoken";
 
 export const postCreate = async (req: Request, res: Response) => {
-  const token = req.cookies.token;
+  const token = req.cookies.accessToken;
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
