@@ -1,67 +1,114 @@
-version: "3.9"
-
+x-common-env: &common-env
+  DATABASE_URL: ${DATABASE_URL}
+  RABBITMQ_URL: ${RABBITMQ_URL}
+  JWT_SECRET: ${JWT_SECRET}
 services:
+  # === NGINX ===
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - gateway
+
+  # === GATEWAY ===
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    ports:
+      - "4001:3000"
+    depends_on:
+      - auth-service
+      - user-service
+      - post-service
+
+  # === RABBITMQ ===
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # === SINGLE POSTGRES DB ===
   postgres:
     image: postgres:15
     container_name: my_postgres
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb # создаётся временно, потом init.sql создаст базы
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: my_pass
+      POSTGRES_DB: mydb
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      - "5432:5432"
 
+  # === AUTH SERVICE ===
   auth-service:
     build:
       context: ./auth-service
     container_name: auth_service
     environment:
-      DATABASE_URL: postgres://user:password@postgres:5432/auth_db
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      <<: *common-env
+      PORT: 3000
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "3001:3000"
+    volumes:
+      - ./auth-service/src:/app/src
 
+  # === USER SERVICE ===
   user-service:
     build:
       context: ./user-service
     container_name: user_service
     environment:
-      DATABASE_URL: postgres://user:password@postgres:5432/user_db
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      <<: *common-env
+      PORT: 3000
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "3002:3000"
+    volumes:
+      - ./user-service/src:/app/src
 
+  # === POST SERVICE ===
   post-service:
     build:
-      context: ./post-service
-    container_name: post_service
+      context: ./posts-service
+    container_name: posts_service
     environment:
-      DATABASE_URL: postgres://user:password@postgres:5432/post_db
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      <<: *common-env
+      PORT: 3000
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "3003:3000"
+    volumes:
+      - ./posts-service/src:/app/src
 
 volumes:
   pgdata:

@@ -20,10 +20,8 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (_, res) => res.send("Server is running greets"));
-app.use("/auth", authRoutes);
-// app.use("/user", userRoutes);
-// app.use("/posts", postsRoutes);
+// app.get("/", (_, res) => res.send("Server is running greets"));
+app.use("/", authRoutes);
 
 // 💥 Подключаем Rabbit и только потом Express
 connectRabbit()

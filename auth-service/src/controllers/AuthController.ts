@@ -31,6 +31,7 @@ export const signup = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "Signup successful",
+      success: true,
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -54,6 +55,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
+  
     if (!user) {
       return res.status(401).json({ message: "Invalid email" });
     }
@@ -80,6 +82,7 @@ export const login = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "Login successful",
+      success: true,
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -125,11 +128,8 @@ export const refreshAccessToken = (req: Request, res: Response) => {
 };
 
 export const logout = (req: Request, res: Response) => {
-res.clearCookie("accessToken", {
-  httpOnly: true,
-  secure: false,
-  path: "/",
-});
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
 
   return res.status(200).json({ message: "Logged out successfully" });
 };

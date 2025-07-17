@@ -1,26 +1,32 @@
-# Используем лёгкий образ Node.js
-FROM node:20-alpine
+FROM node:22 AS builder
 
-# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем package.json и package-lock.json (или pnpm-lock.yaml) сначала
 COPY package*.json ./
 
 # Устанавливаем зависимости
 RUN npm install
 
-# Копируем остальные файлы проекта в контейнер
+
 COPY . .
 
-# Генерируем Prisma Client
-RUN npx prisma generate
+RUN npm run clean-generate && npm run build
 
-# Собираем TypeScript в dist
-RUN npm run build
+# =========================
+# STAGE 2 — RUNNER
+# =========================
+FROM node:22-slim AS runner
 
-# Открываем порт (на всякий случай)
-EXPOSE 3000
+WORKDIR /app
 
-# Команда запуска сервиса
+# Копируем только необходимые файлы из билдера
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./
+COPY --from=builder /app/prisma/schema.prisma ./prisma/
+
+# Устанавливаем только прод зависимости
+RUN npm install --omit=dev
+
+# Запуск
 CMD ["npm", "run", "start"]
+

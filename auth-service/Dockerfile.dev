@@ -1,0 +1,13 @@
+FROM node:22
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+# RUN npm run clean-generate && npm run build
+RUN npm run clean-generate
+
+# CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
