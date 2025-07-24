@@ -32,7 +32,7 @@ export const signup = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "Signup successful",
       success: true,
-      user: {
+      data: {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
@@ -55,7 +55,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-  
+
     if (!user) {
       return res.status(401).json({ message: "Invalid email" });
     }
@@ -83,7 +83,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "Login successful",
       success: true,
-      user: {
+      data: {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,

@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-"start": "prisma generate && node src/index.js",
+    "start": "node src/index.js",
     "seed": "npx prisma db seed",
     "clean-generate": "rm -rf node_modules/.prisma/client && prisma generate",
     "prisma:build": "node scripts/build-schema.js",

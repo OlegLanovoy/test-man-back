@@ -22,7 +22,6 @@ WORKDIR /app
 # Копируем только необходимые файлы из билдера
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./
-COPY --from=builder /app/prisma/schema.prisma ./prisma/
 
 # Устанавливаем только прод зависимости
 RUN npm install --omit=dev
