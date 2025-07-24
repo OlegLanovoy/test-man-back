@@ -36,7 +36,11 @@ jobs:
       - name: 🔐 Decode SSH key
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > key.pem
-          chmod 400 key.pem
+
+          echo "🔐 Устанавливаем права на ключ"
+          chmod 600 key.pem
+          ls -l key.pem
+          file key.pam
 
       - name: 🐳 Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
@@ -72,12 +76,6 @@ jobs:
 
       - name: 🚀 Deploy to EC2
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > key.pem
-
-          echo "🔐 Устанавливаем права на ключ"
-          chmod 600 key.pem
-          ls -l key.pem
-
           echo "📡 Подключаемся к EC2 и деплоим:"
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             echo "✅ Успешно подключились по SSH"
