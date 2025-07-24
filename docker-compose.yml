@@ -60,6 +60,7 @@ services:
   auth-service:
     build:
       context: ./auth-service
+      dockerfile: Dockerfile.dev
     container_name: auth_service
     environment:
       <<: *common-env
@@ -78,6 +79,7 @@ services:
   user-service:
     build:
       context: ./user-service
+      dockerfile: Dockerfile.dev
     container_name: user_service
     environment:
       <<: *common-env
@@ -96,6 +98,7 @@ services:
   post-service:
     build:
       context: ./posts-service
+      dockerfile: Dockerfile.dev
     container_name: posts_service
     environment:
       <<: *common-env
