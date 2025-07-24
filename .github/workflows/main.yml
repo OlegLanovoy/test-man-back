@@ -1,0 +1,46 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🔐 Decode SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: 🐳 Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: 🏗 Build & Push Docker images
+        run: |
+          docker build -t oleg1111/auth_service ./auth-service
+          docker build -t oleg1111/user_service ./user-service
+          docker build -t oleg1111/posts_service ./post-service
+          docker build -t oleg1111/gateway ./gateway
+
+          docker push oleg1111/auth_service
+          docker push oleg1111/user_service
+          docker push oleg1111/posts_service
+          docker push oleg1111/gateway
+
+      - name: 🚀 SSH to EC2 and redeploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            docker pull oleg1111/auth_service
+            docker pull oleg1111/user_service
+            docker pull oleg1111/posts_service
+            docker pull oleg1111/gateway
+
+            cd /home/ubuntu/app
+            docker-compose up -d
+          EOF
