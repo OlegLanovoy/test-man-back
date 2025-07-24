@@ -36,7 +36,7 @@ jobs:
       - name: 🔐 Decode SSH key
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
+          chmod 400 key.pem
 
       - name: 🐳 Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
