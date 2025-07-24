@@ -35,7 +35,7 @@ jobs:
 
       - name: 🔐 Decode SSH key
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > key.pem
           chmod 400 key.pem
 
       - name: 🐳 Login to Docker Hub
@@ -70,13 +70,29 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no -i key.pem docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/app/docker-compose.yml
 
-      - name: 🚀 SSH & Pull on EC2
+      - name: 🚀 Deploy to EC2
         run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > key.pem
+
+          echo "🔐 Устанавливаем права на ключ"
+          chmod 600 key.pem
+          ls -l key.pem
+
+          echo "📡 Подключаемся к EC2 и деплоим:"
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            echo "✅ Успешно подключились по SSH"
+            
+            echo "📥 Тянем свежие образы..."
             docker pull oleg1111/auth_service
             docker pull oleg1111/user_service
             docker pull oleg1111/posts_service
             docker pull oleg1111/gateway
+
+            echo "📂 Переходим в директорию /home/ubuntu/app"
             cd /home/ubuntu/app
+
+            echo "🔁 Поднимаем сервисы через docker-compose"
             docker-compose up -d
+
+            echo "🎉 Деплой завершён!"
           EOF
