@@ -90,7 +90,7 @@ jobs:
             cd app
 
             echo "🔁 Поднимаем сервисы через docker-compose"
-            docker-compose up -d
+            docker compose up -d
 
             echo "🎉 Деплой завершён!"
           EOF
