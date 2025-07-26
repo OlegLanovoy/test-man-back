@@ -55,7 +55,7 @@ services:
 
   # === AUTH SERVICE ===
   auth-service:
-    bimage: oleg1111/auth_service:latest
+    image: oleg1111/auth_service:latest
     container_name: auth_service
     environment:
       <<: *common-env
