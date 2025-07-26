@@ -3,7 +3,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { PORT } from "./secrets";
 
-
 import postsRoutes from "./routes/posts-route";
 
 import { connectRabbit, consumeQueue, sendToQueue } from "./rabbit";
@@ -21,7 +20,7 @@ app.use(cookieParser());
 
 // app.get("/", (_, res) => res.send("Server is running greets"));
 
-app.use("/", postsRoutes);
+app.use("/posts", postsRoutes);
 
 // 💥 Подключаем Rabbit и только потом Express
 connectRabbit()

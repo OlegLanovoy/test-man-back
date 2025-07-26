@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // app.get("/", (_, res) => res.send("Server is running greets"));
-app.use("/", authRoutes);
+app.use("/users", authRoutes);
 
 // 💥 Подключаем Rabbit и только потом Express
 connectRabbit()

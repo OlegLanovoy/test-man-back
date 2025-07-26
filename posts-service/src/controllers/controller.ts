@@ -65,6 +65,32 @@ export const getAllPosts = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Failed to fetch posts" });
   }
 };
+export const getPostById = async (req: Request, res: Response) => {
+  const postId = Number(req.params.id);
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
+    });
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    return res.status(200).json(post);
+  } catch (err) {
+    console.error("getAllPosts error:", err);
+    return res.status(500).json({ message: "Failed to fetch posts" });
+  }
+};
 
 export const deleteLike = async (req: Request, res: Response) => {
   const token = req.cookies.token;
