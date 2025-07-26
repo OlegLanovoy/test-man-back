@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "auth=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^auth-service/' && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "user=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^user-service/' && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "post=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^post-service/' && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "post=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^posts-service/' && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "compose=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^docker-compose.prod.yml$' && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "nginx=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^nginx.conf$' && echo true || echo false)" >> $GITHUB_OUTPUT
 
@@ -62,7 +62,7 @@ jobs:
       - name: 🔧 Build & Push POST
         if: needs.detect-changes.outputs.post == 'true'
         run: |
-          docker build -t oleg1111/posts_service ./post-service
+          docker build -t oleg1111/posts_service ./posts-service
           docker push oleg1111/posts_service
 
       - name: 📤 Upload docker-compose.yml if changed
