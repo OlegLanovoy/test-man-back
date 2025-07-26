@@ -8,18 +8,9 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - gateway
-
-  # === GATEWAY ===
-  gateway:
-    image: oleg1111/gateway:latest
-    container_name: gateway
-    ports:
-      - "4001:3000"
     depends_on:
       - auth-service
       - user-service
