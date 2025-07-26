@@ -1,4 +1,0 @@
-node_modules
-prisma/__generated__
-# Keep environment variables out of version control
-.env

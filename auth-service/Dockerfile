@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run clean-generate && npm run build
+RUN npm run prisma:generate && npm run build
 
 # =========================
 # STAGE 2 — RUNNER

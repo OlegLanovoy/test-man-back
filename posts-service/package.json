@@ -13,6 +13,7 @@
     "start": "node src/index.js",
     "seed": "npx prisma db seed",
     "clean-generate": "rm -rf node_modules/.prisma/client && prisma generate",
+    "prisma:generate": "prisma generate",
     "prisma:build": "node scripts/build-schema.js",
     "prisma:studio": "npm run prisma:build && npx prisma studio"
   },
