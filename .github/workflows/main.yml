@@ -85,7 +85,6 @@ jobs:
             docker pull oleg1111/auth_service
             docker pull oleg1111/user_service
             docker pull oleg1111/posts_service
-            docker pull oleg1111/gateway
 
             echo "📂 Переходим в директорию /app"
             cd app
