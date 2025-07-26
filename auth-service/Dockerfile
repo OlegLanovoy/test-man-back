@@ -22,5 +22,4 @@ COPY --from=builder /app/dist ./
 
 RUN npm install --omit=dev
 
-# Запуск
 CMD ["npm", "run", "start"]

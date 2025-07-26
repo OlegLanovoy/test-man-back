@@ -2,6 +2,13 @@ x-common-env: &common-env
   DATABASE_URL: ${DATABASE_URL}
   RABBITMQ_URL: ${RABBITMQ_URL}
   JWT_SECRET: ${JWT_SECRET}
+
+x-service-deps: &service-deps
+  postgres:
+    condition: service_started
+  rabbitmq:
+    condition: service_healthy
+
 services:
   # === NGINX ===
   nginx:
@@ -54,10 +61,7 @@ services:
       <<: *common-env
       PORT: 3000
     depends_on:
-      postgres:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
+      <<: *service-deps
     ports:
       - "3001:3000"
 
@@ -69,10 +73,7 @@ services:
       <<: *common-env
       PORT: 3000
     depends_on:
-      postgres:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
+      <<: *service-deps
     ports:
       - "3002:3000"
 
@@ -84,10 +85,7 @@ services:
       <<: *common-env
       PORT: 3000
     depends_on:
-      postgres:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
+      <<: *service-deps
     ports:
       - "3003:3000"
 
