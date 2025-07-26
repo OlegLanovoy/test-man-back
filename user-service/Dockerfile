@@ -19,6 +19,7 @@ WORKDIR /app
 
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./
+COPY --from=builder /app/prisma/__generated__ ./prisma
 
 RUN npm install --omit=dev
 
