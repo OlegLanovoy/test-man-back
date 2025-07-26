@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
 
       - id: filter
         run: |
@@ -70,7 +70,7 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no -i key.pem docker-compose.prod.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:app/docker-compose.yml
 
-        name: 📤 Upload nginx.conf if changed
+      - name: 📤 Upload nginx.conf if changed
         if: needs.detect-changes.outputs.nginx == 'true'
         run: |
           scp -o StrictHostKeyChecking=no -i key.pem nginx.conf ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:app/nginx.conf
