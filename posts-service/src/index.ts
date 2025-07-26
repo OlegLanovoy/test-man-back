@@ -9,9 +9,14 @@ import { connectRabbit, consumeQueue, sendToQueue } from "./rabbit";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://d1106fls11il3s.cloudfront.net",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
